@@ -1,0 +1,72 @@
+label {
+    font-weight: bold;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    font-size: 14px;
+    line-height: 2;
+    color: #555;
+    border: 1px solid #ccc;
+  }
+
+  .error {
+    color: red;
+  }
+  
+.form {
+  width: 300px;
+  margin: auto;
+  border: 1px solid grey;
+  border-radius: 4px;
+  padding: 14px 18px;
+}
+
+.form-control {
+  margin-top: 10px;
+}
+
+.form span {
+  font-size: 36px;
+}
+
+.submit-button, .create-account-button {
+  width: 100%;
+  line-height: 2;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: #6bc4ff;
+  border: 1px solid grey;
+}
+
+.submit-button:hover, .create-account-button:hover {
+  cursor: pointer;
+  background-color: #6bd5ff;
+}
+
+.separator {
+  width: 300px;
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: .8rem;
+  padding-top: 0;
+  color: grey;
+}
+
+.separator:before, .separator:after {
+  content: '';
+  flex: 1;
+  border: .5px solid grey;
+}
+
+.separator:before {
+  margin-right: 5px;
+}
+
+.separator:after {
+  margin-left: 5px;
+}
