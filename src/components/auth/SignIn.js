@@ -67,8 +67,7 @@ function SignIn() {
         })
     }
 
-    const provider = new firebase.auth.GoogleAuthProvider();
-
+    const provider = new firebase.auth.FacebookAuthProvider();
     const facebookSignIn = () => {
         firebase.auth().signInWithRedirect(provider);
     }
