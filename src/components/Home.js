@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './messages.css'
+import './home.css'
 import { Link, Redirect } from 'react-router-dom';
 import { auth } from './firebase/config';
 import { makeStyles } from '@material-ui/core/styles';

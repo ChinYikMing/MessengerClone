@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-d
 import Home from './components/Home';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
-import MessagePage from './components/MessagePage';
+import MessagePage from './components/message/MessagePage';
 
 function App() {
   return (

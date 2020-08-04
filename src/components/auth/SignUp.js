@@ -5,7 +5,6 @@ import '../formik/formik.css';
 import FormikControl from '../formik/FormikControl';
 import { Redirect, useHistory } from 'react-router-dom';
 import { auth, db } from '../firebase/config';
-import firebase from 'firebase/app';
 
 function SignUp() {
     const history = useHistory();
@@ -14,10 +13,10 @@ function SignUp() {
     useEffect(() => {
         auth.onAuthStateChanged(user => {
             if (user) {
-               const uid = user.uid;
-               setUid(uid);
+                const uid = user.uid;
+                setUid(uid);
             } else {
-               setUid('');
+                setUid('');
             }
         })
     }, []);
@@ -40,20 +39,35 @@ function SignUp() {
 
     const onSubmit = values => {
         const { email, password, firstName, lastName } = values;
-        firebase.auth().createUserWithEmailAndPassword(email, password).then(res => {
-            return res.user.updateProfile({
-                displayName: lastName + ' ' + firstName
-            })
+        auth.createUserWithEmailAndPassword(email, password).then(res => {
+            res.user.updateProfile({
+                displayName: `${lastName} ${firstName}`
+            });
+            return res.user.uid;
+        }).then(uid => {
+            db.collection('users').doc(uid).set({
+                displayName: `${lastName} ${firstName}`
+            });
+
+            db.collection('users').doc(uid).collection('friends').add({})
+                .then(() => {
+                    console.log("Document successfully written!");
+                })
+                .catch(err => {
+                    console.log("Error writing document", err);
+                })
+        }).then(() => {
+            console.log("Create account successfully");
         }).then(() => {
             history.push('/');
         }).catch(err => {
-            console.log(err);
+            console.log("create account failed", err);
         })
     }
 
-    if(uid)
+    if (uid)
         return <Redirect to='/message' />
-        
+
     return (
         <>
             <div className="form">

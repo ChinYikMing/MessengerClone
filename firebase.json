@@ -4,12 +4,17 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "site": "my-messenger-2246a",
     "public": "build",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }

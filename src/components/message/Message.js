@@ -17,7 +17,7 @@ const useStyles = makeStyles({
     },
 })
 
-function Messenger({ username, text, signInUsername }) {
+function Message({ username, text, signInUsername }) {
     const classes = useStyles();
 
     return (
@@ -37,4 +37,4 @@ function Messenger({ username, text, signInUsername }) {
     )
 }
 
-export default Messenger
+export default Message
