@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
+import moment from 'moment';
 
 const useStyles = makeStyles((theme) => ({
     textFieldStyle: {
@@ -13,20 +14,20 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function MessageInput({ username, messagesCollection }) {
+function MessageInput({ username, currentFriendUid, messagesRef }) {
     const classes = useStyles();
     const [text, setText] = useState('');
     
     const sendMessageHandler = (username, text) => {
-        messagesCollection.add({
+        messagesRef.add({
             username,
             text,
-            sendAt: new Date()
+            sendAt: moment().format("MMMM Do YYYY, h:mm:ss a")
         }).then(() => {
             setText('');
         })
     }
-
+   
     return (
         <div className="input-container">
             <TextField
@@ -38,7 +39,7 @@ function MessageInput({ username, messagesCollection }) {
             <Button
                 variant="contained" color="primary"
                 className={classes.buttonStyle}
-                disabled={!text}
+                disabled={!text || !currentFriendUid}
                 onClick={() => sendMessageHandler(`${username}`, text)}>
                 Send
             </Button>

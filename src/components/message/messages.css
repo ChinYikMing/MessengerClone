@@ -1,6 +1,8 @@
 .messages-container {
     display: flex;
     flex-direction: column;
+    height: 87vh;
+    overflow-y: auto;
 }
 
 .my-messages {
@@ -15,14 +17,20 @@
     margin-left: 5px;
 }
 
+.message-console-container {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+}
+
 .input-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 10px;
-    margin-right: 10px;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
 }
-
 
 .message-page-container {
     display: flex;
@@ -35,23 +43,27 @@
     border-radius: 5px;
 }
 
-.message-console {
-    height: 100vh;
-    overflow: scroll;
-}
-
-.friend-list {
+.friends-list-container {
     display: flex;
     flex-direction: column;
+    width: 50%;
+    margin: 5px 10px;
+}
+
+.friends-list-entry {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
 }
 
 .friendProfile-and-users-container {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    width: 100%;
 }
 
-.friend-profile {
+.friend-profile-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -66,5 +78,11 @@
 
 :target {
     border: 1px solid black;
-    background-color: blue;
+    background-color: grey;
+}
+
+.user-and-friendRequest-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
 }
