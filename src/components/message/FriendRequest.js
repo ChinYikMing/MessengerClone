@@ -95,16 +95,14 @@ function FriendRequest() {
                 <CircularProgress />
             </div>
         ) : (
-                <div>
+                <div className="users-container">
                     Friend Requests
-                    <div className="users-container">
-                        {friendRequestsList.map(fr =>
-                            <div className="user">
-                                {fr.displayName}
-                                <AddIcon onClick={() => acceptFriendHandler(uid, username, fr.uid, fr.displayName)} className={classes.acceptFriendButtonStyle} />
-                            </div>
-                        )}
-                    </div>
+                    {friendRequestsList.map(fr =>
+                        <div className="user">
+                            {fr.displayName}
+                            <AddIcon onClick={() => acceptFriendHandler(uid, username, fr.uid, fr.displayName)} className={classes.acceptFriendButtonStyle} />
+                        </div>
+                    )}
                 </div>
             )
     )

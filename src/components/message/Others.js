@@ -147,21 +147,19 @@ function User() {
                 <CircularProgress />
             </div>
         ) : (
-                <div>
+                <div className="users-container">
                     Other Users
-                    <div className="users-container">
-                        {othersList.map(other =>
-                            other.displayName !== username && 
-                                !pendingRequestsList.includes(other.uid) && 
-                                !requestsList.includes(other.uid) &&
-                                !friendsList.includes(other.uid) ? (
+                    {othersList.map(other =>
+                        other.displayName !== username &&
+                            !pendingRequestsList.includes(other.uid) &&
+                            !requestsList.includes(other.uid) &&
+                            !friendsList.includes(other.uid) ? (
                                 <div className="user">
                                     {other.displayName}
                                     <PersonAddIcon onClick={() => addFriendHandler(uid, username, other.uid, other.displayName)} className={classes.addFriendButtonStyle} />
                                 </div>
                             ) : null
-                        )}
-                    </div>
+                    )}
                 </div>
             )
     )
