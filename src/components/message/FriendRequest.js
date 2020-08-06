@@ -18,7 +18,6 @@ function FriendRequest() {
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState('');
     const [friendRequestsList, setfriendRequestsList] = useState([]);
-    const [clicked, setClicked] = useState(false);
 
     useEffect(() => {
         auth.onAuthStateChanged(user => {
@@ -38,21 +37,17 @@ function FriendRequest() {
                     })
 
                     setfriendRequestsList(friendRequests);
+
+                    if (loading){
+                        setLoading(false);
+                        friendRequests = [];
+                    }
                 })
-
-                if (loading)
-                    setLoading(false);
-            } else
+            } else {
                 setLoading(true);
-
-            friendRequests = [];
+            }
         })
-    }, [clicked])
-
-    const acceptFriendHandler = (uid, username, friendUid, friendDisplayName) => {
-        acceptFriend(uid, username, friendUid, friendDisplayName);
-        setClicked(!clicked);
-    }
+    }, [])
 
     const acceptFriend = (uid, username, friendUid, friendDisplayName) => {
         //user自己的friendList
@@ -67,10 +62,12 @@ function FriendRequest() {
         //發送請求那一方的pendingFriendsRequests
         const reqPendingFriendRequestsListRef = db.collection('users').doc(friendUid).collection('pendingFriendRequests').doc(uid);
 
+        //2個人的共同聊天db
+        const mutualMessagesRef = db.collection('message').doc(`${uid}${friendUid}`);
 
         reqFriendsListRef.set({
             displayName: username,
-            uid,
+            friendUid: uid,
             accept: false
         }).then(() => {
             reqPendingFriendRequestsListRef.delete();
@@ -79,7 +76,9 @@ function FriendRequest() {
                 displayName: friendDisplayName,
                 friendUid,
                 accept: true
-            })
+            });
+        }).then(() => {
+            mutualMessagesRef.set({});
         }).then(() => {
             userfriendRequestsListRef.delete();
         }).then(() => {
@@ -100,7 +99,7 @@ function FriendRequest() {
                     {friendRequestsList.map(fr =>
                         <div className="user">
                             {fr.displayName}
-                            <AddIcon onClick={() => acceptFriendHandler(uid, username, fr.uid, fr.displayName)} className={classes.acceptFriendButtonStyle} />
+                            <AddIcon onClick={() => acceptFriend(uid, username, fr.uid, fr.displayName)} className={classes.acceptFriendButtonStyle} />
                         </div>
                     )}
                 </div>

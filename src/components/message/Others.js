@@ -3,7 +3,6 @@ import { auth, db } from '../firebase/config';
 import { CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import AddIcon from '@material-ui/icons/Add';
 
 const useStyles = makeStyles((theme) => ({
     addFriendButtonStyle: {
@@ -19,7 +18,6 @@ function User() {
     const [uid, setUid] = useState('');
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState('');
-    const [clicked, setClicked] = useState(false);
     const [pendingRequestsList, setPendingRequestsList] = useState([]);
     const [requestsList, setRequestsList] = useState([]);
     const [friendsList, setFriendsList] = useState([]);
@@ -48,6 +46,11 @@ function User() {
                     })
 
                     setOthersList(others);
+
+                    if (loading) {
+                        setLoading(false);
+                        others = [];
+                    }
                 })
 
                 //發送方才有的data
@@ -59,6 +62,11 @@ function User() {
                     })
 
                     setPendingRequestsList(pendingRequests);
+
+                    if (loading) {
+                        setLoading(false);
+                        pendingRequests = [];
+                    }
                 })
 
                 //接收方才有的data
@@ -70,6 +78,11 @@ function User() {
                     })
 
                     setRequestsList(requests);
+
+                    if (loading) {
+                        setLoading(false);
+                        requests = [];
+                    }
                 })
 
                 //user的friendsList
@@ -81,25 +94,17 @@ function User() {
                     })
 
                     setFriendsList(friends);
+
+                    if (loading) {
+                        setLoading(false);
+                        friends = [];
+                    }
                 })
-
-
-                if (loading) {
-                    setLoading(false);
-                    others = [];
-                    pendingRequests = [];
-                    requests = [];
-                    friends = [];
-                }
-
-            } else
+            } else {
                 setLoading(true);
+            }
         })
     }, [])
-
-    const addFriendHandler = (uid, username, friendUid, friendDisplayName) => {
-        addFriend(uid, username, friendUid, friendDisplayName);
-    }
 
     const addFriend = (uid, username, friendUid, friendDisplayName) => {
         const friendRequestsListRef = db.collection('users').doc(friendUid).collection('friendRequests').doc(uid);
@@ -156,7 +161,7 @@ function User() {
                             !friendsList.includes(other.uid) ? (
                                 <div className="user">
                                     {other.displayName}
-                                    <PersonAddIcon onClick={() => addFriendHandler(uid, username, other.uid, other.displayName)} className={classes.addFriendButtonStyle} />
+                                    <PersonAddIcon onClick={() => addFriend(uid, username, other.uid, other.displayName)} className={classes.addFriendButtonStyle} />
                                 </div>
                             ) : null
                     )}

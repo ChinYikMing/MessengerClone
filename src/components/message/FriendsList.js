@@ -3,6 +3,8 @@ import { auth, db } from '../firebase/config';
 import { CircularProgress } from '@material-ui/core';
 import PersonAddDisabledIcon from '@material-ui/icons/PersonAddDisabled';
 import { makeStyles } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import { Link, Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles({
     deleteButtonStyle: {
@@ -11,6 +13,10 @@ const useStyles = makeStyles({
         }
     }
 });
+
+const signOut = () => {
+    auth.signOut();
+}
 
 function FriendList({ setCurrentFriendUid }) {
     const classes = useStyles();
@@ -36,13 +42,12 @@ function FriendList({ setCurrentFriendUid }) {
                     });
 
                     setFriendsList(friends);
+
+                    if (loading) {
+                        setLoading(false);
+                        friends = [];
+                    }
                 })
-
-
-                if (loading) {
-                    setLoading(false);
-                    friends = [];
-                }
             } else {
                 setLoading(true);
             }
@@ -50,6 +55,9 @@ function FriendList({ setCurrentFriendUid }) {
     }, [])
 
     const deleteFriend = (friendUid, displayName) => {
+        //reset currentFriendUid
+        setCurrentFriendUid('');
+        
         //user自己的friendsList
         const userfriendsListRef = db.collection('users').doc(uid).collection('friends').doc(friendUid);
 
@@ -71,7 +79,7 @@ function FriendList({ setCurrentFriendUid }) {
 
     return (
         loading ? (
-            <div style={{ height: '100vh' }}>
+            <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'  }}>
                 <CircularProgress />
             </div>
         ) : (
@@ -98,6 +106,17 @@ function FriendList({ setCurrentFriendUid }) {
                             </div>
                         </div>
                     )}
+                    <div className="signout-button">
+                        <Link to='/' className={classes.linkStyle}>
+                            <Button
+                                variant="contained" color="primary"
+                                className={classes.buttonStyle}
+                                onClick={() => signOut()}
+                            >
+                                Sign Out
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             )
     )

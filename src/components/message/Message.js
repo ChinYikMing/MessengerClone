@@ -27,6 +27,7 @@ const useStyles = makeStyles({
 function Message({ username, text, sendAt, signInUsername }) {
     const classes = useStyles();
     const [clicked, setClicked] = useState(false);
+    const momentSendAt = moment(sendAt.toDate()).format("MMMM Do YYYY, h:mm:ss a");
 
     return (
         username == signInUsername ? (
@@ -37,7 +38,7 @@ function Message({ username, text, sendAt, signInUsername }) {
                 {
                     clicked ? (
                         <Typography variant="subtitle2" >
-                            {sendAt}
+                            {momentSendAt}
                         </Typography>
                     ) : null
                 }
@@ -50,7 +51,7 @@ function Message({ username, text, sendAt, signInUsername }) {
                     {
                     clicked ? (
                         <Typography variant="subtitle2">
-                            {sendAt}
+                            {momentSendAt}
                         </Typography>
                     ) : null
                 }

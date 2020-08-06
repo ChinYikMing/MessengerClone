@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
-import moment from 'moment';
 
 const useStyles = makeStyles((theme) => ({
     textFieldStyle: {
@@ -22,7 +21,7 @@ function MessageInput({ username, currentFriendUid, messagesRef }) {
         messagesRef.add({
             username,
             text,
-            sendAt: moment().format("MMMM Do YYYY, h:mm:ss a")
+            sendAt: new Date()
         }).then(() => {
             setText('');
         })
