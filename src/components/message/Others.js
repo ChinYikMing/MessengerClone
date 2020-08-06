@@ -23,88 +23,121 @@ function User() {
     const [friendsList, setFriendsList] = useState([]);
 
     useEffect(() => {
-        auth.onAuthStateChanged(user => {
+        const user = auth.currentUser;
+        if (user) {
+            const { uid } = user;
+            setUid(uid);
+
             let others = [];
+
+            //所有user的data
+            const othersRef = db.collection('users');
+            const unsubscribe = othersRef.onSnapshot(snapshot => {
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const displayName = data.displayName;
+
+                    // firebase updateProfile no effect
+                    if (id === uid) {
+                        setUsername(displayName);
+                    }
+
+                    others.push({ uid: id, displayName });
+                })
+
+                setOthersList(others);
+
+                if (loading) {
+                    setLoading(false);
+                    others = [];
+                }
+            })
+
+            return () => unsubscribe();
+        }
+    }, []);
+
+    useEffect(() => {
+        const user = auth.currentUser;
+        if (user) {
+            const { uid } = user;
+
             let pendingRequests = [];
+
+            //發送方才有的data
+            const userPendingFriendRequestsListRef = db.collection('users').doc(uid).collection('pendingFriendRequests');
+            const unsubscribe = userPendingFriendRequestsListRef.onSnapshot(snapshot => {
+                snapshot.forEach(doc => {
+                    const uid = doc.id;
+                    pendingRequests.push(uid);
+                })
+
+                setPendingRequestsList(pendingRequests);
+
+                if (loading) {
+                    setLoading(false);
+                    pendingRequests = [];
+                }
+            })
+
+            return () => unsubscribe();
+        }
+    }, []);
+
+    useEffect(() => {
+        const user = auth.currentUser;
+        if (user) {
+            const { uid } = user;
+
             let requests = [];
+
+            //發送方才有的data
+            const requestsListRef = db.collection('users').doc(uid).collection('friendRequests');
+            const unsubscribe = requestsListRef.onSnapshot(snapshot => {
+                snapshot.forEach(doc => {
+                    const uid = doc.id;
+                    requests.push(uid);
+                })
+
+                setRequestsList(requests);
+
+                if (loading) {
+                    setLoading(false);
+                    requests = [];
+                }
+            })
+
+            return () => unsubscribe();
+        }
+    }, []);
+
+    useEffect(() => {
+        const user = auth.currentUser;
+        if (user) {
+            const { uid } = user;
+
             let friends = [];
 
-            if (user) {
-                const uid = user.uid;
-                const displayName = user.displayName
-                setUsername(displayName);
-                setUid(uid);
-
-                //所有user的data
-                const othersRef = db.collection('users');
-                othersRef.onSnapshot(snapshot => {
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const uid = doc.id;
-                        const displayName = data.displayName;
-                        others.push({ uid, displayName });
-                    })
-
-                    setOthersList(others);
-
-                    if (loading) {
-                        setLoading(false);
-                        others = [];
-                    }
+            //user的friendsList
+            const friendsListRef = db.collection('users').doc(uid).collection('friends');
+            const unsubscribe = friendsListRef.onSnapshot(snapshot => {
+                snapshot.forEach(doc => {
+                    const uid = doc.id;
+                    friends.push(uid);
                 })
 
-                //發送方才有的data
-                const userPendingFriendRequestsListRef = db.collection('users').doc(uid).collection('pendingFriendRequests');
-                userPendingFriendRequestsListRef.onSnapshot(snapshot => {
-                    snapshot.forEach(doc => {
-                        const uid = doc.id;
-                        pendingRequests.push(uid);
-                    })
+                setFriendsList(friends);
 
-                    setPendingRequestsList(pendingRequests);
+                if (loading) {
+                    setLoading(false);
+                    friends = [];
+                }
+            })
 
-                    if (loading) {
-                        setLoading(false);
-                        pendingRequests = [];
-                    }
-                })
-
-                //接收方才有的data
-                const requestsListRef = db.collection('users').doc(uid).collection('friendRequests');
-                requestsListRef.onSnapshot(snapshot => {
-                    snapshot.forEach(doc => {
-                        const uid = doc.id;
-                        requests.push(uid);
-                    })
-
-                    setRequestsList(requests);
-
-                    if (loading) {
-                        setLoading(false);
-                        requests = [];
-                    }
-                })
-
-                //user的friendsList
-                const friendsListRef = db.collection('users').doc(uid).collection('friends');
-                friendsListRef.onSnapshot(snapshot => {
-                    snapshot.forEach(doc => {
-                        const uid = doc.id;
-                        friends.push(uid);
-                    })
-
-                    setFriendsList(friends);
-
-                    if (loading) {
-                        setLoading(false);
-                        friends = [];
-                    }
-                })
-            } else {
-                setLoading(true);
-            }
-        })
-    }, [])
+            return () => unsubscribe();
+        }
+    }, []);
 
     const addFriend = (uid, username, friendUid, friendDisplayName) => {
         const friendRequestsListRef = db.collection('users').doc(friendUid).collection('friendRequests').doc(uid);
@@ -148,18 +181,18 @@ function User() {
 
     return (
         loading ? (
-            <div style={{ height: '100%' }}>
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <CircularProgress />
             </div>
         ) : (
                 <div className="users-container">
-                    Other Users
+                    <h3>Other Users</h3>
                     {othersList.map(other =>
-                        other.displayName !== username &&
+                        other.uid !== uid &&
                             !pendingRequestsList.includes(other.uid) &&
                             !requestsList.includes(other.uid) &&
                             !friendsList.includes(other.uid) ? (
-                                <div className="user">
+                                <div className="user" key={other.uid}>
                                     {other.displayName}
                                     <PersonAddIcon onClick={() => addFriend(uid, username, other.uid, other.displayName)} className={classes.addFriendButtonStyle} />
                                 </div>

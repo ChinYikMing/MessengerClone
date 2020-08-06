@@ -4,79 +4,85 @@ import { auth, db } from '../firebase/config';
 import Message from './Message';
 import { CircularProgress } from '@material-ui/core';
 
-function MessageConsole({ currentFriendUid }) {
+function MessageConsole({ currentFriendUid, currentFriendDisplayName }) {
     const [messages, setMessages] = useState([]);
     const [username, setUsername] = useState('');
     const [loading, setLoading] = useState(true);
     const [mutualMessagesRef, setMutualMessagesRef] = useState({});
 
     useEffect(() => {
-        auth.onAuthStateChanged(user => {
-            if (user && currentFriendUid) {
-                let datasFromDb = [];
-                let accept = false;
-                let messagesRef;
-                const uid = user.uid;
-                const displayName = user.displayName
-                setUsername(displayName);
+        const user = auth.currentUser;
+        if (user) {
+            const { uid, displayName } = user;
+            let messagesRef = '';
+            setUsername(displayName);
 
+            if (currentFriendUid) {
                 const userFriendsListRef = db.collection('users').doc(uid).collection('friends').where('friendUid', '==', currentFriendUid);
                 userFriendsListRef.get().then(snapshot => {
                     snapshot.forEach(doc => {
-                        const data = doc.data();
-                        accept = data.accept;
+                        const { mutualMessagesRefUid } = doc.data();
+                        messagesRef = db.collection('message').doc(mutualMessagesRefUid).collection('messages');
                     })
 
-                    const mutualMessagesRefUid = accept ? `${currentFriendUid}${uid}` : `${uid}${currentFriendUid}`;
-                    messagesRef = db.collection('message').doc(mutualMessagesRefUid).collection('messages');
-
-                    // pass the messagesRef to messageInput component to send messages
+                    setLoading(true);
                     setMutualMessagesRef(messagesRef);
-
-                    //get the specific friends messages data
-                    messagesRef.orderBy("sendAt").onSnapshot(snapshot => {
-                        snapshot.forEach(doc => {
-                            const data = doc.data();
-                            datasFromDb.push(data);
-                        });
-
-                        setMessages(datasFromDb);
-
-                        if (loading) {
-                            setLoading(false);
-                            datasFromDb = [];
-                        }
-                    })
                 })
-            } else {
-                setLoading(true);
-                setMessages([]);
-                setUsername('');
             }
-        })
+        }
     }, [currentFriendUid])
+
+    useEffect(() => {
+        let datasFromDb = [];
+
+        if (Object.keys(mutualMessagesRef).length !== 0) {
+            const unsubscribe = mutualMessagesRef.orderBy("sendAt").onSnapshot(snapshot => {
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    datasFromDb.push(data);
+                });
+                setMessages(datasFromDb);
+
+                if (loading) {
+                    setLoading(false);
+                    datasFromDb = [];
+                }
+            })
+
+            return () => unsubscribe();
+        }
+    }, [mutualMessagesRef])
 
     return (
         loading && currentFriendUid ? (
-            <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <CircularProgress />
             </div>
         ) : (
                 <div className="message-console-container">
                     <div className="messages-container">
                         {
-                            messages.map(message =>
-                                <Message
-                                    key={message.text}
-                                    username={message.username}
-                                    text={message.text}
-                                    sendAt={message.sendAt}
-                                    signInUsername={username}
-                                />
-                            )
+                            messages.length === 0 ? (
+                                <div style={{ textAlign: 'center' }}>
+                                    <h4 style={{ lineHeight: '20vh' }}>
+                                        Start chatting with
+                                        {currentFriendDisplayName ? ' ' + currentFriendDisplayName : " your friends"}
+                                    </h4>
+                                </div>
+                            ) : (
+                                    messages.map(message =>
+                                        <Message
+                                            key={message.text}
+                                            username={message.username}
+                                            text={message.text}
+                                            sendAt={message.sendAt}
+                                            signInUsername={username}
+                                        />
+                                    )
+                                )
                         }
                     </div>
-                    <MessageInput username={username} currentFriendUid={currentFriendUid} messagesRef={mutualMessagesRef} />
+                    <MessageInput username={username} currentFriendUid={currentFriendUid} mutualMessagesRef={mutualMessagesRef} />
                 </div>
             )
     )

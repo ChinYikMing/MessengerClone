@@ -10,6 +10,7 @@ import FriendRequest from './FriendRequest';
 
 function MessagePage() {
     const [currentFriendUid, setCurrentFriendUid] = useState('');
+    const [currentFriendDisplayName, setCurrentFriendDisplayName] = useState('');
     const [uid, setUid] = useState('');
 
     useEffect(() => {
@@ -28,10 +29,16 @@ function MessagePage() {
 
     return (
         <div className="message-page-container">
-            <FriendsList setCurrentFriendUid={setCurrentFriendUid} />
-            <MessageConsole currentFriendUid={currentFriendUid} />
+            <FriendsList 
+                setCurrentFriendUid={setCurrentFriendUid} 
+                setCurrentFriendDisplayName={setCurrentFriendDisplayName}
+            />
+            <MessageConsole 
+                currentFriendUid={currentFriendUid} 
+                currentFriendDisplayName={currentFriendDisplayName}
+            />
             <div className="friendProfile-and-users-container">
-                <FriendProfile />
+                <FriendProfile currentFriendDisplayName={currentFriendDisplayName}/>
                 <div className="user-and-friendRequest-container">
                     <Others />
                     <FriendRequest />

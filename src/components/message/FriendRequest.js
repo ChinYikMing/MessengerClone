@@ -21,33 +21,30 @@ function FriendRequest() {
     const [friendRequestsList, setfriendRequestsList] = useState([]);
 
     useEffect(() => {
-        auth.onAuthStateChanged(user => {
+        const user = auth.currentUser;
+        if (user) {
+            const { uid, displayName } = user;
+            setUid(uid);
+            setUsername(displayName);
+
             let friendRequests = [];
+            const friendRequestsListRef = db.collection('users').doc(uid).collection('friendRequests');
 
-            if (user) {
-                const uid = user.uid;
-                const displayName = user.displayName
-                setUsername(displayName);
-                setUid(uid);
-
-                const friendRequestsListRef = db.collection('users').doc(uid).collection('friendRequests');
-                friendRequestsListRef.onSnapshot(snapshot => {
-                    snapshot.forEach(doc => {
-                        const { uid, displayName, accept } = doc.data();
-                        friendRequests.push({ uid, displayName, accept });
-                    })
-
-                    setfriendRequestsList(friendRequests);
-
-                    if (loading) {
-                        setLoading(false);
-                        friendRequests = [];
-                    }
+            const unsubscribe = friendRequestsListRef.onSnapshot(snapshot => {
+                snapshot.forEach(doc => {
+                    const { uid, displayName, accept } = doc.data();
+                    friendRequests.push({ uid, displayName, accept });
                 })
-            } else {
-                setLoading(true);
-            }
-        })
+
+                setfriendRequestsList(friendRequests);
+
+                if (loading) {
+                    setLoading(false);
+                    friendRequests = [];
+                }
+            })
+            return () => unsubscribe();
+        }
     }, [])
 
     const rejectFriend = (uid, username, friendUid, friendDisplayName) => {
@@ -78,20 +75,20 @@ function FriendRequest() {
         //發送請求那一方的pendingFriendsRequests
         const reqPendingFriendRequestsListRef = db.collection('users').doc(friendUid).collection('pendingFriendRequests').doc(uid);
 
-        //2個人的共同聊天db
+        //2個人的共同聊天記錄db
         const mutualMessagesRef = db.collection('message').doc(`${uid}${friendUid}`);
 
         reqFriendsListRef.set({
             displayName: username,
             friendUid: uid,
-            accept: false
+            mutualMessagesRefUid: uid + friendUid
         }).then(() => {
             reqPendingFriendRequestsListRef.delete();
         }).then(() => {
             userFriendsListRef.set({
                 displayName: friendDisplayName,
                 friendUid,
-                accept: true
+                mutualMessagesRefUid: uid + friendUid
             });
         }).then(() => {
             mutualMessagesRef.set({});
@@ -106,12 +103,12 @@ function FriendRequest() {
 
     return (
         loading ? (
-            <div style={{ height: '100%' }}>
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <CircularProgress />
             </div>
         ) : (
                 <div className="users-container">
-                    Friend Requests
+                    <h3>Friend Requests</h3>
                     {friendRequestsList.map(fr =>
                         <div className="user">
                             {fr.displayName}

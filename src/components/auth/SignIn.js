@@ -60,8 +60,8 @@ function SignIn() {
     const onSubmit = values => {
         const { email, password } = values;
         firebase.auth().signInWithEmailAndPassword(email, password).then(res => {
-            const uid = res.user.uid;
-            history.push('/');
+            console.log('Sign In successfully')
+            history.push('/message');
         }).catch(err => {
             console.log(err);
         })

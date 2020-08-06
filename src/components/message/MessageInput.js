@@ -13,18 +13,24 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function MessageInput({ username, currentFriendUid, messagesRef }) {
+function MessageInput({ username, currentFriendUid, mutualMessagesRef }) {
     const classes = useStyles();
     const [text, setText] = useState('');
     
     const sendMessageHandler = (username, text) => {
-        messagesRef.add({
+        mutualMessagesRef.add({
             username,
             text,
             sendAt: new Date()
         }).then(() => {
             setText('');
         })
+
+        //hangle latest messages
+        // .then(() => {
+        //     const messages = document.getElementsByClassName("messages");
+        //     messages[messages.length - 1].scrollIntoView();
+        // })
     }
    
     return (

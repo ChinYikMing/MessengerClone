@@ -30,8 +30,8 @@ function Message({ username, text, sendAt, signInUsername }) {
     const momentSendAt = moment(sendAt.toDate()).format("MMMM Do YYYY, h:mm:ss a");
 
     return (
-        username == signInUsername ? (
-            <div className="my-messages" onClick={() => setClicked(!clicked)}>
+        username === signInUsername ? (
+            <div className="my-messages messages" onClick={() => setClicked(!clicked)}>
                 <Typography className={classes.myTypoStyles}>
                     {text}
                 </Typography >
@@ -44,7 +44,7 @@ function Message({ username, text, sendAt, signInUsername }) {
                 }
             </div>
         ) : (
-                <div className="others-messages" onClick={() => setClicked(!clicked)}>
+                <div className="others-messages messages" onClick={() => setClicked(!clicked)}>
                     <Typography className={classes.othersTypoStyles}>
                         {text}
                     </Typography>

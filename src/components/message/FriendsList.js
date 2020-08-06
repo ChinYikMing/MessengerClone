@@ -4,7 +4,7 @@ import { CircularProgress } from '@material-ui/core';
 import PersonAddDisabledIcon from '@material-ui/icons/PersonAddDisabled';
 import { makeStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles({
     deleteButtonStyle: {
@@ -15,10 +15,12 @@ const useStyles = makeStyles({
 });
 
 const signOut = () => {
-    auth.signOut();
+    auth.signOut().then(() => {
+        console.log('Sign Out successfully')
+    });
 }
 
-function FriendList({ setCurrentFriendUid }) {
+function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName }) {
     const classes = useStyles();
     const [searchVal, setSearchVal] = useState('');
     const [uid, setUid] = useState('');
@@ -26,38 +28,37 @@ function FriendList({ setCurrentFriendUid }) {
     const [friendsList, setFriendsList] = useState([]);
 
     useEffect(() => {
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                let friends = [];
-                const uid = user.uid;
-                setUid(uid);
+        const user = auth.currentUser;
+        if (user) {
+            const { uid } = user;
+            setUid(uid);
 
-                const friendsRef = db.collection('users').doc(uid).collection('friends').where('displayName', '>', '');
-                //get the friends list of the users
-                friendsRef.onSnapshot(snapshot => {
-                    snapshot.forEach(doc => {
-                        const id = doc.id;
-                        const { displayName, accept } = doc.data();
-                        friends.push({ displayName, id, accept });
-                    });
+            let friends = [];
+            const friendsRef = db.collection('users').doc(uid).collection('friends').where('displayName', '>', '');
 
-                    setFriendsList(friends);
+            const unsubscribe = friendsRef.onSnapshot(snapshot => {
+                snapshot.forEach(doc => {
+                    const id = doc.id;
+                    const { displayName, accept } = doc.data();
+                    friends.push({ displayName, id, accept });
+                });
 
-                    if (loading) {
-                        setLoading(false);
-                        friends = [];
-                    }
-                })
-            } else {
-                setLoading(true);
-            }
-        })
-    }, [])
+                setFriendsList(friends);
+
+                if (loading) {
+                    setLoading(false);
+                    friends = [];
+                }
+            })
+
+            return () => unsubscribe();
+        }
+    })
 
     const deleteFriend = (friendUid, displayName) => {
         //reset currentFriendUid
         setCurrentFriendUid('');
-        
+
         //user自己的friendsList
         const userfriendsListRef = db.collection('users').doc(uid).collection('friends').doc(friendUid);
 
@@ -65,8 +66,8 @@ function FriendList({ setCurrentFriendUid }) {
         const friendsListRef = db.collection('users').doc(friendUid).collection('friends').doc(uid);
 
         //刪除他們共同的聊天記錄, firebase不支持刪除subcollection, 所以暫時先同步(friendUid + Uid 和 Uid + friendUid)
-        let messageUid = uid + friendUid;
-        let messageRef = db.collection('message').doc(messageUid).collection('messages');
+        // let messageUid = uid + friendUid;
+        // let messageRef = db.collection('message').doc(messageUid).collection('messages');
 
         userfriendsListRef.delete().then(() => {
             friendsListRef.delete();
@@ -77,9 +78,14 @@ function FriendList({ setCurrentFriendUid }) {
         })
     }
 
+    const selectFriendHandler = (friendUid, friendDisplayName) => {
+        setCurrentFriendUid(friendUid);
+        setCurrentFriendDisplayName(friendDisplayName);
+    }
+
     return (
         loading ? (
-            <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'  }}>
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <CircularProgress />
             </div>
         ) : (
@@ -92,10 +98,11 @@ function FriendList({ setCurrentFriendUid }) {
                             onChange={e => setSearchVal(e.target.value)}
                         />
                     </div>
+                    <div><h2>Your friends List</h2></div>
                     {friendsList.map(friend =>
-                        friend.displayName.toLowerCase().indexOf(searchVal) != -1 &&
-                        < div className="friends-list-entry" >
-                            <div onClick={() => setCurrentFriendUid(`${friend.id}`)}>
+                        friend.displayName.toLowerCase().indexOf(searchVal) !== -1 &&
+                        < div className="friends-list-entry" key={friend.id}>
+                            <div onClick={() => selectFriendHandler(friend.id, friend.displayName)}>
                                 <a href={`#${friend.id}`} id={`${friend.id}`} style={{ textDecoration: 'none', color: 'black' }}>
                                     {friend.displayName}
                                 </a>
@@ -123,3 +130,4 @@ function FriendList({ setCurrentFriendUid }) {
 }
 
 export default FriendList
+

@@ -3,11 +3,10 @@ import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
 import '../formik/formik.css';
 import FormikControl from '../formik/FormikControl';
-import { Redirect, useHistory } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { auth, db } from '../firebase/config';
 
 function SignUp() {
-    const history = useHistory();
     const [uid, setUid] = useState('');
 
     useEffect(() => {
@@ -42,13 +41,18 @@ function SignUp() {
         auth.createUserWithEmailAndPassword(email, password).then(res => {
             res.user.updateProfile({
                 displayName: `${lastName} ${firstName}`
+            }).then(() => {
+                console.log("update user's displayName successfully");
+            }).catch(err => {
+                console.log("update user's displayName failed", err);
             });
             return res.user.uid;
         }).then(uid => {
             db.collection('users').doc(uid).set({
                 displayName: `${lastName} ${firstName}`
             });
-
+            return uid;
+        }).then(uid => {
             db.collection('users').doc(uid).collection('friends').add({})
                 .then(() => {
                     console.log("Document successfully written!");
@@ -58,8 +62,6 @@ function SignUp() {
                 })
         }).then(() => {
             console.log("Create account successfully");
-        }).then(() => {
-            history.push('/');
         }).catch(err => {
             console.log("create account failed", err);
         })

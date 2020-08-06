@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './home.css'
-import { Link, Redirect } from 'react-router-dom';
-import { auth } from './firebase/config';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 
@@ -20,21 +19,6 @@ const useStyles = makeStyles((theme) => ({
 
 function Home() {
     const classes = useStyles();
-    const [uid, setUid] = useState('');
-
-    useEffect(() => {
-        auth.onAuthStateChanged(user => {
-            if (user) {
-               const uid = user.uid;
-               setUid(uid);
-            } else {
-               setUid('');
-            }
-        })
-    }, []);
-
-    if(uid)
-        return <Redirect to='/message' />
 
     return (
         <div className="home-container">
