@@ -16,23 +16,27 @@ const useStyles = makeStyles((theme) => ({
 function MessageInput({ username, currentFriendUid, mutualMessagesRef }) {
     const classes = useStyles();
     const [text, setText] = useState('');
-    
-    const sendMessageHandler = (username, text) => {
-        mutualMessagesRef.add({
-            username,
-            text,
-            sendAt: new Date()
-        }).then(() => {
-            setText('');
-        })
 
-        //hangle latest messages
-        // .then(() => {
-        //     const messages = document.getElementsByClassName("messages");
-        //     messages[messages.length - 1].scrollIntoView();
-        // })
+    const sendMessageHandler = (username, text) => {
+        if (currentFriendUid && text) {
+            mutualMessagesRef.add({
+                username,
+                text,
+                sendAt: new Date()
+            }).then(() => {
+                setText('');
+                const messages = document.getElementsByClassName("messages");
+                messages[messages.length - 1].scrollIntoView();
+            })
+        }
     }
-   
+
+    const keyDownHandler = (e, username, text) => {
+        if (e.key === 'Enter') {
+            sendMessageHandler(username, text);
+        }
+    }
+
     return (
         <div className="input-container">
             <TextField
@@ -40,12 +44,14 @@ function MessageInput({ username, currentFriendUid, mutualMessagesRef }) {
                 value={text}
                 className={classes.textFieldStyle}
                 onChange={e => setText(e.target.value)}
+                onKeyDown={(e) => keyDownHandler(e, username, text)}
             />
             <Button
                 variant="contained" color="primary"
                 className={classes.buttonStyle}
                 disabled={!text || !currentFriendUid}
-                onClick={() => sendMessageHandler(`${username}`, text)}>
+                onClick={() => sendMessageHandler(username, text)}
+            >
                 Send
             </Button>
         </div>
