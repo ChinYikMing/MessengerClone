@@ -11,34 +11,45 @@ import FriendRequest from './FriendRequest';
 function MessagePage() {
     const [currentFriendUid, setCurrentFriendUid] = useState('');
     const [currentFriendDisplayName, setCurrentFriendDisplayName] = useState('');
+    const [currentFriendAvatar, setCurrentFriendAvatar] = useState('');
     const [uid, setUid] = useState('');
 
     useEffect(() => {
+        const user = auth.currentUser;
+        if (user) {
+            const userPhotoUrl = user.photoURL;
+            setCurrentFriendAvatar(userPhotoUrl);
+        }
         auth.onAuthStateChanged(user => {
             if (user) {
                 const uid = user.uid;
+
                 setUid(uid);
             } else {
                 setUid('');
             }
         })
-    })
+    }, [])
 
     if (!auth.W)
         return <Redirect to='/signin' />
 
     return (
         <div className="message-page-container">
-            <FriendsList 
-                setCurrentFriendUid={setCurrentFriendUid} 
+            <FriendsList
+                setCurrentFriendUid={setCurrentFriendUid}
                 setCurrentFriendDisplayName={setCurrentFriendDisplayName}
+                setCurrentFriendAvatar={setCurrentFriendAvatar}
             />
-            <MessageConsole 
-                currentFriendUid={currentFriendUid} 
+            <MessageConsole
+                currentFriendUid={currentFriendUid}
                 currentFriendDisplayName={currentFriendDisplayName}
             />
             <div className="friendProfile-and-users-container">
-                <FriendProfile currentFriendDisplayName={currentFriendDisplayName}/>
+                <FriendProfile
+                    currentFriendDisplayName={currentFriendDisplayName}
+                    currentFriendAvatar={currentFriendAvatar}
+                />
                 <div className="user-and-friendRequest-container">
                     <Others />
                     <FriendRequest />

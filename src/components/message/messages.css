@@ -85,3 +85,8 @@
     justify-content: space-evenly;
     height: 60%;
 }
+
+.avatar-upload-form {
+    display: flex;
+    margin-top: 10px;
+}

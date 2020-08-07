@@ -8,6 +8,7 @@ import { auth, db } from '../firebase/config';
 
 function SignUp() {
     const [uid, setUid] = useState('');
+    const defaultAvatar = "https://images.unsplash.com/photo-1463725876303-ff840e2aa8d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1189&q=80";
 
     useEffect(() => {
         auth.onAuthStateChanged(user => {
@@ -40,7 +41,8 @@ function SignUp() {
         const { email, password, firstName, lastName } = values;
         auth.createUserWithEmailAndPassword(email, password).then(res => {
             res.user.updateProfile({
-                displayName: `${lastName} ${firstName}`
+                displayName: `${lastName} ${firstName}`,
+                photoURL: defaultAvatar
             }).then(() => {
                 console.log("update user's displayName successfully");
             }).catch(err => {
@@ -49,17 +51,21 @@ function SignUp() {
             return res.user.uid;
         }).then(uid => {
             db.collection('users').doc(uid).set({
-                displayName: `${lastName} ${firstName}`
+                displayName: `${lastName} ${firstName}`,
+                avatar: defaultAvatar
             });
             return uid;
         }).then(uid => {
-            db.collection('users').doc(uid).collection('friends').add({})
-                .then(() => {
+            db.collection('users').doc(uid).collection('friends').doc(uid).set({
+                displayName: `${lastName} ${firstName}`,
+                friendUid: uid,
+                mutualMessagesRefUid: uid,
+                avatar: defaultAvatar
+            }).then(() => {
                     console.log("Document successfully written!");
-                })
-                .catch(err => {
+            }).catch(err => {
                     console.log("Error writing document", err);
-                })
+            })
         }).then(() => {
             console.log("Create account successfully");
         }).catch(err => {

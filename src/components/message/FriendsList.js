@@ -20,12 +20,14 @@ const signOut = () => {
     });
 }
 
-function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName }) {
+function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurrentFriendAvatar }) {
     const classes = useStyles();
     const [searchVal, setSearchVal] = useState('');
     const [uid, setUid] = useState('');
     const [loading, setLoading] = useState(true);
     const [friendsList, setFriendsList] = useState([]);
+    const [username, setUsername] = useState('');
+    const [userAvatar, setUserAvatar] = useState('');
 
     useEffect(() => {
         const user = auth.currentUser;
@@ -34,13 +36,19 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName }) {
             setUid(uid);
 
             let friends = [];
-            const friendsRef = db.collection('users').doc(uid).collection('friends').where('displayName', '>', '');
+            const friendsRef = db.collection('users').doc(uid).collection('friends');
 
             const unsubscribe = friendsRef.onSnapshot(snapshot => {
                 snapshot.forEach(doc => {
                     const id = doc.id;
-                    const { displayName, accept } = doc.data();
-                    friends.push({ displayName, id, accept });
+                    const { displayName, avatar } = doc.data();
+
+                    if (id === uid) {
+                        setUsername(displayName);
+                        setUserAvatar(avatar);
+                    }
+
+                    friends.push({ displayName, id, avatar });
                 });
 
                 setFriendsList(friends);
@@ -53,7 +61,7 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName }) {
 
             return () => unsubscribe();
         }
-    })
+    }, [])
 
     const deleteFriend = (friendUid, displayName) => {
         //reset currentFriendUid
@@ -78,9 +86,10 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName }) {
         })
     }
 
-    const selectFriendHandler = (friendUid, friendDisplayName) => {
+    const selectFriendHandler = (friendUid, friendDisplayName, friendAvatar) => {
         setCurrentFriendUid(friendUid);
         setCurrentFriendDisplayName(friendDisplayName);
+        setCurrentFriendAvatar(friendAvatar);
     }
 
     return (
@@ -99,10 +108,18 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName }) {
                         />
                     </div>
                     <div><h2>Your friends List</h2></div>
+                    < div className="friends-list-entry" key={uid}>
+                        <div onClick={() => selectFriendHandler(uid, username, userAvatar)}>
+                            <a href={`#${uid}`} id={uid} style={{ textDecoration: 'none', color: 'black' }}>
+                                My Profile
+                            </a>
+                        </div>
+                    </div>
                     {friendsList.map(friend =>
                         friend.displayName.toLowerCase().indexOf(searchVal) !== -1 &&
+                        friend.displayName !== username &&
                         < div className="friends-list-entry" key={friend.id}>
-                            <div onClick={() => selectFriendHandler(friend.id, friend.displayName)}>
+                            <div onClick={() => selectFriendHandler(friend.id, friend.displayName, friend.avatar)}>
                                 <a href={`#${friend.id}`} id={`${friend.id}`} style={{ textDecoration: 'none', color: 'black' }}>
                                     {friend.displayName}
                                 </a>

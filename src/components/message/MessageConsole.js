@@ -6,6 +6,7 @@ import { CircularProgress } from '@material-ui/core';
 
 function MessageConsole({ currentFriendUid, currentFriendDisplayName }) {
     const [messages, setMessages] = useState([]);
+    const [uid, setUid]= useState('');
     const [username, setUsername] = useState('');
     const [loading, setLoading] = useState(true);
     const [mutualMessagesRef, setMutualMessagesRef] = useState({});
@@ -15,6 +16,7 @@ function MessageConsole({ currentFriendUid, currentFriendDisplayName }) {
         if (user) {
             const { uid, displayName } = user;
             let messagesRef = '';
+            setUid(uid);
             setUsername(displayName);
 
             if (currentFriendUid) {
@@ -22,7 +24,7 @@ function MessageConsole({ currentFriendUid, currentFriendDisplayName }) {
                 userFriendsListRef.get().then(snapshot => {
                     snapshot.forEach(doc => {
                         const { mutualMessagesRefUid } = doc.data();
-                        messagesRef = db.collection('message').doc(mutualMessagesRefUid).collection('messages');
+                        messagesRef = db.collection('mutualMessages').doc(mutualMessagesRefUid).collection('messages');
                     })
 
                     setLoading(true);
@@ -52,7 +54,7 @@ function MessageConsole({ currentFriendUid, currentFriendDisplayName }) {
             return () => unsubscribe();
         }
     }, [mutualMessagesRef])
-
+    
     return (
         loading && currentFriendUid ? (
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

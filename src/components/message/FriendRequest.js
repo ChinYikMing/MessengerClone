@@ -47,7 +47,7 @@ function FriendRequest() {
         }
     }, [])
 
-    const rejectFriend = (uid, username, friendUid, friendDisplayName) => {
+    const rejectFriend = (uid, friendUid, friendDisplayName) => {
         //user自己的friendsRequestsList
         const userfriendRequestsListRef = db.collection('users').doc(uid).collection('friendRequests').doc(friendUid);
 
@@ -63,11 +63,17 @@ function FriendRequest() {
     }
 
     const acceptFriend = (uid, username, friendUid, friendDisplayName) => {
+        //user自己的detail
+        const userDetailRef = db.collection('users').doc(uid);
+
         //user自己的friendList
         const userFriendsListRef = db.collection('users').doc(uid).collection('friends').doc(friendUid);
 
         //user自己的friendsRequestsList
         const userfriendRequestsListRef = db.collection('users').doc(uid).collection('friendRequests').doc(friendUid);
+
+        //發送請求那一方的detail
+        const reqDetailRef = db.collection('users').doc(friendUid);
 
         //發送請求那一方的friendList
         const reqFriendsListRef = db.collection('users').doc(friendUid).collection('friends').doc(uid);
@@ -75,29 +81,37 @@ function FriendRequest() {
         //發送請求那一方的pendingFriendsRequests
         const reqPendingFriendRequestsListRef = db.collection('users').doc(friendUid).collection('pendingFriendRequests').doc(uid);
 
-        //2個人的共同聊天記錄db
-        const mutualMessagesRef = db.collection('message').doc(`${uid}${friendUid}`);
 
-        reqFriendsListRef.set({
-            displayName: username,
-            friendUid: uid,
-            mutualMessagesRefUid: uid + friendUid
+        userDetailRef.get().then(doc => {
+            const data = doc.data();
+            return data.avatar;
+        }).then(avatar => {
+            reqFriendsListRef.set({
+                displayName: username,
+                friendUid: uid,
+                mutualMessagesRefUid: uid + friendUid,
+                avatar
+            }).then(() => {
+                reqPendingFriendRequestsListRef.delete();
+            })
         }).then(() => {
-            reqPendingFriendRequestsListRef.delete();
-        }).then(() => {
-            userFriendsListRef.set({
-                displayName: friendDisplayName,
-                friendUid,
-                mutualMessagesRefUid: uid + friendUid
-            });
-        }).then(() => {
-            mutualMessagesRef.set({});
-        }).then(() => {
-            userfriendRequestsListRef.delete();
-        }).then(() => {
-            console.log(`Accept ${friendDisplayName} successfully`);
-        }).catch(err => {
-            console.log(`Accept ${friendDisplayName} failed`, err);
+            reqDetailRef.get().then(doc => {
+                const data = doc.data();
+                return data.avatar;
+            }).then(avatar => {
+                userFriendsListRef.set({
+                    displayName: friendDisplayName,
+                    friendUid,
+                    mutualMessagesRefUid: uid + friendUid,
+                    avatar
+                });
+            }).then(() => {
+                userfriendRequestsListRef.delete();
+            }).then(() => {
+                console.log(`Accept ${friendDisplayName} successfully`);
+            }).catch(err => {
+                console.log(`Accept ${friendDisplayName} failed`, err);
+            })
         })
     }
 
@@ -110,10 +124,10 @@ function FriendRequest() {
                 <div className="users-container">
                     <h3>Friend Requests</h3>
                     {friendRequestsList.map(fr =>
-                        <div className="user">
+                        <div className="user" key={fr.uid}>
                             {fr.displayName}
                             <AddIcon onClick={() => acceptFriend(uid, username, fr.uid, fr.displayName)} className={classes.buttonStyle} />
-                            <ClearIcon onClick={() => rejectFriend(uid, username, fr.uid, fr.displayName)} className={classes.buttonStyle} />
+                            <ClearIcon onClick={() => rejectFriend(uid, fr.uid, fr.displayName)} className={classes.buttonStyle} />
                         </div>
                     )}
                 </div>
