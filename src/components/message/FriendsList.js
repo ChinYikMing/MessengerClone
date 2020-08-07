@@ -27,7 +27,7 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
     const [loading, setLoading] = useState(true);
     const [friendsList, setFriendsList] = useState([]);
     const [username, setUsername] = useState('');
-    const [userAvatar, setUserAvatar] = useState('');
+    const [avatar, setAvatar] = useState('');
 
     useEffect(() => {
         const user = auth.currentUser;
@@ -45,7 +45,7 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
 
                     if (id === uid) {
                         setUsername(displayName);
-                        setUserAvatar(avatar);
+                        setAvatar(avatar);
                     }
 
                     friends.push({ displayName, id, avatar });
@@ -109,7 +109,7 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
                     </div>
                     <div><h2>Your friends List</h2></div>
                     < div className="friends-list-entry" key={uid}>
-                        <div onClick={() => selectFriendHandler(uid, username, userAvatar)}>
+                        <div onClick={() => selectFriendHandler(uid, username, avatar)}>
                             <a href={`#${uid}`} id={uid} style={{ textDecoration: 'none', color: 'black' }}>
                                 My Profile
                             </a>

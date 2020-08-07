@@ -49,6 +49,7 @@ function MessagePage() {
                 <FriendProfile
                     currentFriendDisplayName={currentFriendDisplayName}
                     currentFriendAvatar={currentFriendAvatar}
+                    setCurrentFriendAvatar={setCurrentFriendAvatar}
                 />
                 <div className="user-and-friendRequest-container">
                     <Others />

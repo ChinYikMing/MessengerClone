@@ -90,3 +90,7 @@
     display: flex;
     margin-top: 10px;
 }
+
+.linear-progress-container {
+    width: 100%;
+}

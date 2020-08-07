@@ -32,8 +32,10 @@ function MessageInput({ username, currentFriendUid, mutualMessagesRef }) {
     }
 
     const keyDownHandler = (e, username, text) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.shiftKey) {
             sendMessageHandler(username, text);
+        } else {
+            console.log(123);
         }
     }
 
@@ -41,6 +43,8 @@ function MessageInput({ username, currentFriendUid, mutualMessagesRef }) {
         <div className="input-container">
             <TextField
                 label="Your message:"
+                multiline
+                rowsMax={3}
                 value={text}
                 className={classes.textFieldStyle}
                 onChange={e => setText(e.target.value)}
