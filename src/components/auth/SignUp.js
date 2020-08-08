@@ -8,6 +8,7 @@ import { auth, db } from '../firebase/config';
 
 function SignUp() {
     const [uid, setUid] = useState('');
+    const [error, setError] = useState('');
     const defaultAvatar = "https://images.unsplash.com/photo-1463725876303-ff840e2aa8d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1189&q=80";
 
     useEffect(() => {
@@ -70,6 +71,7 @@ function SignUp() {
             console.log("Create account successfully");
         }).catch(err => {
             console.log("create account failed", err);
+            setError(err.message);
         })
     }
 
@@ -121,7 +123,7 @@ function SignUp() {
                         </button>
                     </Form>
                 </Formik>
-                {/* {authError && <div className="error">{authError}</div>} */}
+                {error && <div className="error">{error}</div>}
             </div>
         </>
     )

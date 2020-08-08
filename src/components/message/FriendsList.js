@@ -70,9 +70,6 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
     }
 
     const deleteFriend = (friendUid, displayName, mutualMessagesRefUid) => {
-        //reset currentFriendUid
-        setCurrentFriendUid('');
-
         //user自己的friendsList
         const userfriendsListRef = db.collection('users').doc(uid).collection('friends').doc(friendUid);
 
@@ -112,6 +109,9 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
         }).then(() => {
             friendsListRef.delete();
         }).then(() => {
+            //clear the messages console
+            selectFriendHandler(uid, username, avatar);
+        }).then(() => {
             console.log(`Deleted ${displayName} successfully`);
         }).catch(err => {
             console.log(`Deleted ${displayName} failed`, err);
@@ -147,7 +147,7 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
                                 <div onClick={() => selectFriendHandler(uid, username, avatar)}>
                                     <a href={`#${uid}`} id={uid} style={{ textDecoration: 'none', color: 'black' }}>
                                         My Profile
-                            </a>
+                                    </a>
                                 </div>
                             </div>
                             {friendsList.map(friend =>

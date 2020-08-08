@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './messages.css'
 import { auth } from '../firebase/config';
 import { Redirect } from 'react-router-dom';
@@ -12,25 +12,8 @@ function MessagePage() {
     const [currentFriendUid, setCurrentFriendUid] = useState('');
     const [currentFriendDisplayName, setCurrentFriendDisplayName] = useState('');
     const [currentFriendAvatar, setCurrentFriendAvatar] = useState('');
-    const [uid, setUid] = useState('');
 
-    useEffect(() => {
-        const user = auth.currentUser;
-        if (user) {
-            const userPhotoUrl = user.photoURL;
-            setCurrentFriendAvatar(userPhotoUrl);
-        }
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                const uid = user.uid;
-
-                setUid(uid);
-            } else {
-                setUid('');
-            }
-        })
-    }, [])
-
+    //auth.W is uid
     if (!auth.W)
         return <Redirect to='/signin' />
 

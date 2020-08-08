@@ -34,6 +34,7 @@ const useStyles = makeStyles({
 function SignIn() {
     const classes = useStyles();
     const history = useHistory();
+    const [error, setError] = useState('');
     const [uid, setUid] = useState('');
 
     useEffect(() => {
@@ -41,8 +42,6 @@ function SignIn() {
             if (user) {
                const uid = user.uid;
                setUid(uid);
-            } else {
-               setUid('');
             }
         })
     }, []);
@@ -64,6 +63,7 @@ function SignIn() {
             history.push('/message');
         }).catch(err => {
             console.log(err);
+            setError(err.message);
         })
     }
 
@@ -111,7 +111,7 @@ function SignIn() {
                         <button type="submit" className="submit-button">Sign In</button>
                     </Form>
                 </Formik>
-                {/* {authError && <div className="error">{authError}</div>} */}
+                {error && <div className="error">{error}</div>}
             </div>
             <div className="separator">New to Messenger?</div>
             <Link to='/signup' className={classes.linkStyle}>
