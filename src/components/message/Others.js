@@ -152,8 +152,7 @@ function User() {
             if (res === undefined) {
                 friendRequestsListRef.set({
                     displayName: username,
-                    uid,
-                    accept: true
+                    uid
                 })
             } else {
                 throw new Error(`he/she is your friend already`);
@@ -165,8 +164,7 @@ function User() {
                 if (res === undefined) {
                     userPendingFriendRequestsListRef.set({
                         displayName: friendDisplayName,
-                        uid: friendUid,
-                        accept: false
+                        uid: friendUid
                     })
                 } else {
                     throw new Error(`he/she is already in your pending friend requests list`);

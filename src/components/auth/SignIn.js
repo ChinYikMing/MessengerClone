@@ -4,7 +4,7 @@ import { Formik, Form } from 'formik';
 import '../formik/formik.css';
 import FormikControl from '../formik/FormikControl';
 import { Button, makeStyles } from '@material-ui/core';
-import { Link, useHistory, Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { blue } from '@material-ui/core/colors';
 import { auth } from '../firebase/config';
 import firebase from 'firebase/app';
@@ -33,18 +33,61 @@ const useStyles = makeStyles({
 
 function SignIn() {
     const classes = useStyles();
-    const history = useHistory();
     const [error, setError] = useState('');
     const [uid, setUid] = useState('');
 
     useEffect(() => {
         auth.onAuthStateChanged(user => {
             if (user) {
-               const uid = user.uid;
-               setUid(uid);
+                const uid = user.uid;
+                setUid(uid);
             }
         })
     }, []);
+
+    useEffect(() => {
+        auth.getRedirectResult().then(function (result) {
+            if (result.credential) {
+                // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+                const token = result.credential.accessToken;
+                // ...
+            }
+            // The signed-in user info.
+            const user = result.user;
+        }).catch(function (error) {
+            // Handle Errors here.
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const existingEmail = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            const pendingCred = error.credential;
+            // ...
+            if (errorCode === 'auth/account-exists-with-different-credential') {
+                // Lookup existing account’s provider ID.
+                return auth.fetchSignInMethodsForEmail(existingEmail)
+                    .then(providers => {
+                        if (providers.indexOf(firebase.auth.EmailAuthProvider.PROVIDER_ID) !== -1) {
+                            // Password account already exists with the same email.
+                            // Ask user to provide password associated with that account.
+                            var password = window.prompt('Please provide the password for ' + existingEmail);
+                            return auth.signInWithEmailAndPassword(existingEmail, password);
+                        }
+                    })
+                    .then(() => {
+                        const user = auth.currentUser;
+                        // Existing email/password signed in.
+                        // Link Facebook OAuth credential to existing account.
+                        return user.linkWithCredential(pendingCred);
+                    }).then(usercred => {
+                        const user = usercred.user;
+                        console.log("Account linking success", user);
+                    }).catch(err => {
+                        console.log("Account linking error", err);
+                    });;;
+            }
+        });
+    }, [])
 
     const initialValues = {
         email: '',
@@ -60,20 +103,19 @@ function SignIn() {
         const { email, password } = values;
         firebase.auth().signInWithEmailAndPassword(email, password).then(res => {
             console.log('Sign In successfully')
-            history.push('/message');
         }).catch(err => {
             console.log(err);
             setError(err.message);
         })
     }
 
-    const provider = new firebase.auth.FacebookAuthProvider();
     const facebookSignIn = () => {
-        firebase.auth().signInWithRedirect(provider);
+        const provider = new firebase.auth.FacebookAuthProvider();
+        auth.signInWithRedirect(provider);
     }
 
     if (uid)
-        return <Redirect to='/message' /> 
+        return <Redirect to='/message' />
 
     return (
         <>
@@ -84,7 +126,7 @@ function SignIn() {
                     onClick={() => facebookSignIn()}
                     className={classes.facebookSignInButton}
                 >
-                   <FacebookIcon />Sign in with Facebook
+                    <FacebookIcon />Sign in with Facebook
             </Button>
             </div>
             <div className="separator">Or</div>
