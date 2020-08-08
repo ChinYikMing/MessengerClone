@@ -41,14 +41,14 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
             const unsubscribe = friendsRef.onSnapshot(snapshot => {
                 snapshot.forEach(doc => {
                     const id = doc.id;
-                    const { displayName, avatar } = doc.data();
+                    const { displayName, avatar, mutualMessagesRefUid } = doc.data();
 
                     if (id === uid) {
                         setUsername(displayName);
                         setAvatar(avatar);
                     }
 
-                    friends.push({ displayName, id, avatar });
+                    friends.push({ displayName, id, avatar, mutualMessagesRefUid });
                 });
 
                 setFriendsList(friends);
@@ -63,7 +63,13 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
         }
     }, [])
 
-    const deleteFriend = (friendUid, displayName) => {
+    const deleteMessage = (messageRef) => {
+        return new Promise((resolve, reject) => {
+            messageRef.delete();
+        });
+    }
+
+    const deleteFriend = (friendUid, displayName, mutualMessagesRefUid) => {
         //reset currentFriendUid
         setCurrentFriendUid('');
 
@@ -73,11 +79,37 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
         //要刪除那一方的friendsList
         const friendsListRef = db.collection('users').doc(friendUid).collection('friends').doc(uid);
 
-        //刪除他們共同的聊天記錄, firebase不支持刪除subcollection, 所以暫時先同步(friendUid + Uid 和 Uid + friendUid)
-        // let messageUid = uid + friendUid;
-        // let messageRef = db.collection('message').doc(messageUid).collection('messages');
-
-        userfriendsListRef.delete().then(() => {
+        //刪除user和friend的共同聊天記錄的subcollection "messages"
+        const mutualMessagesRef = db.collection('mutualMessages').doc(mutualMessagesRefUid).collection('messages');
+        mutualMessagesRef.get().then(snapshot => {
+            let messagesId = [];
+            snapshot.forEach(doc => {
+                const id = doc.id;
+                messagesId.push(id);
+            })
+            return messagesId;
+        }).then(messagesId => {
+            let messagesRef = [];
+            messagesId.forEach(messageId => {
+                let messageRef = db.collection('mutualMessages').doc(mutualMessagesRefUid).collection('messages').doc(messageId);
+                messagesRef.push(messageRef);
+            })
+            return messagesRef;
+        }).then(messagesRef => {
+            let promises = [];
+            messagesRef.forEach(messageRef => {
+                let promise = deleteMessage(messageRef);
+                promises.push(promise);
+            })
+            return promises;
+        }).then(promises => {
+            Promise.all(promises);
+        }).then(() => {
+            //刪除user和friend的共同聊天記錄
+            db.collection('mutualMessages').doc(mutualMessagesRefUid).delete();
+        }).then(() => {
+            userfriendsListRef.delete()
+        }).then(() => {
             friendsListRef.delete();
         }).then(() => {
             console.log(`Deleted ${displayName} successfully`);
@@ -125,7 +157,7 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
                                 </a>
                             </div>
                             <div><PersonAddDisabledIcon
-                                onClick={() => deleteFriend(friend.id, friend.displayName)}
+                                onClick={() => deleteFriend(friend.id, friend.displayName, friend.mutualMessagesRefUid)}
                                 className={classes.deleteButtonStyle} />
                             </div>
                         </div>
