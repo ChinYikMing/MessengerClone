@@ -103,24 +103,24 @@ function FriendProfile({ currentFriendDisplayName, currentFriendAvatar, setCurre
             <img className="profile-image" src={currentFriendAvatar} />
             <div className="profile-name">{currentFriendDisplayName}</div>
             {currentFriendDisplayName === username ? (
-                <>
+                <div className="avatar-upload-form-container">
                     <div className="linear-progress-container">
                         <LinearProgress
                             variant="determinate"
                             value={progress}
                         />
                     </div>
-                    <form className="avatar-upload-form" onSubmit={uploadHandler}>
+                    <form onSubmit={uploadHandler}>
                         <input
                             type="file"
                             id="avatar"
                             name="avatar"
-                            accept="image/png, image/jpeg"
+                            accept="image/*"
                             onChange={e => setAvatar(e.target.files[0])}
                         />
                         <button type="submit">Upload</button>
                     </form>
-                </>
+                </div>
             ) : null
             }
         </div>

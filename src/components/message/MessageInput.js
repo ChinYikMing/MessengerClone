@@ -18,15 +18,13 @@ function MessageInput({ username, currentFriendUid, mutualMessagesRef }) {
     const [text, setText] = useState('');
 
     const sendMessageHandler = (username, text) => {
-        if (currentFriendUid && text) {
+        if (currentFriendUid && text.replace(/\n/g, '').length) {
             mutualMessagesRef.add({
                 username,
                 text,
                 sendAt: new Date()
             }).then(() => {
                 setText('');
-                const messages = document.getElementsByClassName("messages");
-                messages[messages.length - 1].scrollIntoView();
             })
         }
     }
@@ -34,8 +32,6 @@ function MessageInput({ username, currentFriendUid, mutualMessagesRef }) {
     const keyDownHandler = (e, username, text) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             sendMessageHandler(username, text);
-        } else {
-            console.log(123);
         }
     }
 
@@ -44,7 +40,7 @@ function MessageInput({ username, currentFriendUid, mutualMessagesRef }) {
             <TextField
                 label="Your message:"
                 multiline
-                rowsMax={3}
+                rowsMax={2}
                 value={text}
                 className={classes.textFieldStyle}
                 onChange={e => setText(e.target.value)}

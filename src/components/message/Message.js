@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Typography, makeStyles } from '@material-ui/core';
 import { blue, grey } from '@material-ui/core/colors';
 import moment from 'moment';
@@ -25,13 +25,22 @@ const useStyles = makeStyles({
 })
 
 function Message({ username, text, sendAt, signInUsername }) {
+    const scrollRef = useRef(null);
     const classes = useStyles();
     const [clicked, setClicked] = useState(false);
     const momentSendAt = moment(sendAt.toDate()).format("MMMM Do YYYY, h:mm:ss a");
 
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollIntoView({
+                behavior: "smooth",
+            });
+        }
+    }, [])
+
     return (
         username === signInUsername ? (
-            <div className="my-messages messages" onClick={() => setClicked(!clicked)}>
+            <div className="my-messages messages" ref={scrollRef} onClick={() => setClicked(!clicked)}>
                 <Typography className={classes.myTypoStyles}>
                     {text}
                 </Typography >
@@ -44,7 +53,7 @@ function Message({ username, text, sendAt, signInUsername }) {
                 }
             </div>
         ) : (
-                <div className="others-messages messages" onClick={() => setClicked(!clicked)}>
+                <div className="others-messages messages" ref={scrollRef} onClick={() => setClicked(!clicked)}>
                     <Typography className={classes.othersTypoStyles}>
                         {text}
                     </Typography>

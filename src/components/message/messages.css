@@ -1,49 +1,22 @@
-.messages-container {
-    display: flex;
-    flex-direction: column;
-    height: 93vh;
-    overflow-y: auto;
+* {
+    box-sizing: border-box;
 }
 
 .my-messages {
     align-self: flex-end;
-    margin-top: 5px;
+    margin-top: 10px;
     margin-right: 5px;
 }
 
 .others-messages {
     align-self: flex-start;
-    margin-top: 5px;
+    margin-top: 10px;
     margin-left: 5px;
-}
-
-.message-console-container {
-    height: 100vh;
-    width: 100%;
-}
-
-.input-container {
-    display: flex;
-}
-
-.message-page-container {
-    display: flex;
-    justify-content: space-evenly;
-    overflow-y: hidden;
-    height: 100vh;
 }
 
 .search-box > input {
     border-radius: 5px;
 }
-
-.friends-list-container {
-    display: flex;
-    flex-direction: column;
-    width: 50%;
-    margin: 5px 10px;
-}
-
 
 .friends-list-entry {
     display: flex;
@@ -51,28 +24,63 @@
     margin-top: 10px;
 }
 
-.friendProfile-and-users-container {
+.message-page-container {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.friends-list-container {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    width: 87%;
+    width: 30%;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    position: relative;
 }
 
 .signout-button {
-    margin-top: auto;
+    position: fixed;
+    bottom: 3%;
+}
+
+.message-console-container {
+    width: 30%;
+    margin-right: 2.5%;
+}
+
+.messages-container {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    overflow-y: auto;
+}
+
+.input-container {
+    display: flex;
+}
+
+.friendProfile-and-users-container {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    margin-right: 2.5%;
 }
 
 .friend-profile-container {
     display: flex;
     flex-direction: column;
-    height: 30%;
-    justify-content: flex-start;
     align-items: center;
+    justify-content: center;
 }
 
 .profile-image {
-    object-fit: contain;
-    height: 100%;
+    width: 50%;
+}
+
+.profile-name {
+    margin-top: 10px;
+    font-weight: bold;
 }
 
 :target {
@@ -83,14 +91,54 @@
 .user-and-friendRequest-container {
     display: flex;
     justify-content: space-evenly;
-    height: 60%;
 }
 
-.avatar-upload-form {
-    display: flex;
+.avatar-upload-form-container {
+    margin-top: auto;
+    justify-content: center;
+    align-items: center;
     margin-top: 10px;
 }
 
 .linear-progress-container {
     width: 100%;
 }
+
+/* Extra small devices (phones, 650px and down) */
+@media only screen and (max-width: 650px) {
+
+    .message-page-container {
+        height: auto;
+    }
+
+    .friends-list-container, 
+    .message-console-container, 
+    .friendProfile-and-users-container {
+        width: 100%;
+        margin: 2.5%;
+    }
+
+    .friends-list-container {
+        background-color: #71c9ce;
+    }
+
+    .message-console-container {
+        background-color: #a6e3e9;
+    }
+
+    .friendProfile-and-users-container {
+        background-color: #cbf1f5;
+    }
+
+    .profile-image {
+        object-fit: contain;
+        width: 100%;
+    }
+
+    .signout-button {
+        position: absolute;
+        top: 18%;
+        right: 2%;
+    }
+}
+

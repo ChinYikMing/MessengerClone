@@ -125,56 +125,62 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
     }
 
     return (
-        loading ? (
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <CircularProgress />
-            </div>
-        ) : (
-                <div className="friends-list-container">
-                    <div className="search-box">
-                        <input
-                            type="text"
-                            placeholder="搜索 Messenger"
-                            value={searchVal}
-                            onChange={e => setSearchVal(e.target.value)}
-                        />
-                    </div>
-                    <div><h2>Your friends List</h2></div>
-                    < div className="friends-list-entry" key={uid}>
-                        <div onClick={() => selectFriendHandler(uid, username, avatar)}>
-                            <a href={`#${uid}`} id={uid} style={{ textDecoration: 'none', color: 'black' }}>
-                                My Profile
+
+        <div className="friends-list-container">
+            {
+                loading ? (
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <CircularProgress />
+                    </div >
+                ) : (
+                        <>
+                            <div className="search-box">
+                                <input
+                                    type="text"
+                                    placeholder="搜索 Messenger"
+                                    value={searchVal}
+                                    onChange={e => setSearchVal(e.target.value)}
+                                />
+                            </div>
+                            <div><h2>Your friends List</h2></div>
+                            < div className="friends-list-entry" key={uid}>
+                                <div onClick={() => selectFriendHandler(uid, username, avatar)}>
+                                    <a href={`#${uid}`} id={uid} style={{ textDecoration: 'none', color: 'black' }}>
+                                        My Profile
                             </a>
-                        </div>
-                    </div>
-                    {friendsList.map(friend =>
-                        friend.displayName.toLowerCase().indexOf(searchVal) !== -1 &&
-                        friend.displayName !== username &&
-                        < div className="friends-list-entry" key={friend.id}>
-                            <div onClick={() => selectFriendHandler(friend.id, friend.displayName, friend.avatar)}>
-                                <a href={`#${friend.id}`} id={`${friend.id}`} style={{ textDecoration: 'none', color: 'black' }}>
-                                    {friend.displayName}
-                                </a>
+                                </div>
                             </div>
-                            <div><PersonAddDisabledIcon
-                                onClick={() => deleteFriend(friend.id, friend.displayName, friend.mutualMessagesRefUid)}
-                                className={classes.deleteButtonStyle} />
+                            {friendsList.map(friend =>
+                                friend.displayName.toLowerCase().indexOf(searchVal.toLowerCase()) !== -1 &&
+                                friend.displayName !== username &&
+                                < div className="friends-list-entry" key={friend.id}>
+                                    <div onClick={() => selectFriendHandler(friend.id, friend.displayName, friend.avatar)}>
+                                        <a href={`#${friend.id}`} id={`${friend.id}`} style={{ textDecoration: 'none', color: 'black' }}>
+                                            {friend.displayName}
+                                        </a>
+                                    </div>
+                                    <div><PersonAddDisabledIcon
+                                        onClick={() => deleteFriend(friend.id, friend.displayName, friend.mutualMessagesRefUid)}
+                                        className={classes.deleteButtonStyle} />
+                                    </div>
+                                </div>
+                            )}
+                            <div className="signout-button">
+                                <Link to='/' className={classes.linkStyle}>
+                                    <Button
+                                        variant="contained" color="primary"
+                                        className={classes.buttonStyle}
+                                        onClick={() => signOut()}
+                                    >
+                                        Sign Out
+                                    </Button>
+                                </Link>
                             </div>
-                        </div>
-                    )}
-                    <div className="signout-button">
-                        <Link to='/' className={classes.linkStyle}>
-                            <Button
-                                variant="contained" color="primary"
-                                className={classes.buttonStyle}
-                                onClick={() => signOut()}
-                            >
-                                Sign Out
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
-            )
+
+                        </>
+                    )
+            }
+        </div>
     )
 }
 
