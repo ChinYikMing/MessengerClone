@@ -1,8 +1,32 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Setting your firebase config file like below
+Create a directory called firebase in src/components and create a file called config.js in that directory <br />
+Then<br />
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
+import 'firebase/storage';
+
+const firebaseConfig = {
+  your firebase config
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+export { auth, db, storage };
+
 ## Available Scripts
 
 In the project directory, you can run:
+
+### `npm install`
+
+To install all dependencies of the app
 
 ### `npm start`
 
