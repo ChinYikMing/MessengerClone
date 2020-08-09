@@ -4,6 +4,8 @@ import { CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
+import RejectFriendModal from '../modal/RejectFriendModal';
+import AcceptFriendModal from '../modal/AcceptFriendModal';
 
 const useStyles = makeStyles((theme) => ({
     buttonStyle: {
@@ -18,6 +20,10 @@ function FriendRequest() {
     const [uid, setUid] = useState('');
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
+    const [acceptModalIsOpen, setAcceptModalIsOpen] = useState(false);
+    const [otherDisplayName, setOtherDisplayName] = useState('');
+    const [otherUid, setOtherUid] = useState('');
     const [friendRequestsList, setfriendRequestsList] = useState([]);
 
     useEffect(() => {
@@ -47,22 +53,22 @@ function FriendRequest() {
         }
     }, [])
 
-    const rejectFriend = (uid, friendUid, friendDisplayName) => {
-        //user自己的friendsRequestsList
-        const userfriendRequestsListRef = db.collection('users').doc(uid).collection('friendRequests').doc(friendUid);
+    const modalHandler = (friendUid, friendDisplayName) => {
+        setIsOpen(true);
 
-        //發送請求那一方的pendingFriendsRequests
-        const reqPendingFriendRequestsListRef = db.collection('users').doc(friendUid).collection('pendingFriendRequests').doc(uid);
+        //set otherDisplayName to pass to modal
+        setOtherDisplayName(friendDisplayName);
 
-        userfriendRequestsListRef.delete()
-            .then(() => {
-                reqPendingFriendRequestsListRef.delete()
-            }).then(() => {
-                console.log(`You have rejected ${friendDisplayName}'s friend request`);
-            })
+        //set otherUid to pass to modal
+        setOtherUid(friendUid);
     }
 
     const acceptFriend = (uid, username, friendUid, friendDisplayName) => {
+        setAcceptModalIsOpen(true);
+
+        //set otherDisplayName to pass to modal
+        setOtherDisplayName(friendDisplayName);
+
         //user自己的detail
         const userDetailRef = db.collection('users').doc(uid);
 
@@ -122,12 +128,24 @@ function FriendRequest() {
             </div>
         ) : (
                 <div className="users-container">
+                    <AcceptFriendModal 
+                        open={acceptModalIsOpen} 
+                        setIsOpen={setAcceptModalIsOpen}
+                        otherDisplayName={otherDisplayName}
+                    />
+                    <RejectFriendModal 
+                        open={isOpen} 
+                        setIsOpen={setIsOpen}
+                        uid={uid}
+                        otherUid={otherUid} 
+                        otherDisplayName={otherDisplayName}
+                    />
                     <h3>Friend Requests</h3>
                     {friendRequestsList.map(fr =>
                         <div className="user" key={fr.uid}>
                             {fr.displayName}
                             <AddIcon onClick={() => acceptFriend(uid, username, fr.uid, fr.displayName)} className={classes.buttonStyle} />
-                            <ClearIcon onClick={() => rejectFriend(uid, fr.uid, fr.displayName)} className={classes.buttonStyle} />
+                            <ClearIcon onClick={() => modalHandler(fr.uid, fr.displayName)} className={classes.buttonStyle} />
                         </div>
                     )}
                 </div>

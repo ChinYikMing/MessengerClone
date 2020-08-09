@@ -5,12 +5,16 @@ import PersonAddDisabledIcon from '@material-ui/icons/PersonAddDisabled';
 import { makeStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
+import DeleteFriendModal from '../modal/DeleteFriendModal';
 
 const useStyles = makeStyles({
     deleteButtonStyle: {
         '&:hover': {
             cursor: 'pointer'
         }
+    },
+    linkStyle: {
+        textDecoration: 'none'
     }
 });
 
@@ -28,6 +32,10 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
     const [friendsList, setFriendsList] = useState([]);
     const [username, setUsername] = useState('');
     const [avatar, setAvatar] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
+    const [otherUid, setOtherUid] = useState('');
+    const [otherDisplayName, setOtherDisplayName] = useState('');
+    const [mutualMessagesRefUid, setMutualMessagessRefUid] = useState('');
 
     useEffect(() => {
         const user = auth.currentUser;
@@ -63,59 +71,17 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
         }
     }, [])
 
-    const deleteMessage = (messageRef) => {
-        return new Promise((resolve, reject) => {
-            messageRef.delete();
-        });
-    }
+    const modalHandler = (friendUid, friendDisplayName, mutualMessagesRefUid) => {
+        setIsOpen(true);
 
-    const deleteFriend = (friendUid, displayName, mutualMessagesRefUid) => {
-        //user自己的friendsList
-        const userfriendsListRef = db.collection('users').doc(uid).collection('friends').doc(friendUid);
+        //set otherDisplayName to pass to modal
+        setOtherDisplayName(friendDisplayName);
 
-        //要刪除那一方的friendsList
-        const friendsListRef = db.collection('users').doc(friendUid).collection('friends').doc(uid);
+        //set otherUid to pass to modal
+        setOtherUid(friendUid);
 
-        //刪除user和friend的共同聊天記錄的subcollection "messages"
-        const mutualMessagesRef = db.collection('mutualMessages').doc(mutualMessagesRefUid).collection('messages');
-        mutualMessagesRef.get().then(snapshot => {
-            let messagesId = [];
-            snapshot.forEach(doc => {
-                const id = doc.id;
-                messagesId.push(id);
-            })
-            return messagesId;
-        }).then(messagesId => {
-            let messagesRef = [];
-            messagesId.forEach(messageId => {
-                let messageRef = db.collection('mutualMessages').doc(mutualMessagesRefUid).collection('messages').doc(messageId);
-                messagesRef.push(messageRef);
-            })
-            return messagesRef;
-        }).then(messagesRef => {
-            let promises = [];
-            messagesRef.forEach(messageRef => {
-                let promise = deleteMessage(messageRef);
-                promises.push(promise);
-            })
-            return promises;
-        }).then(promises => {
-            Promise.all(promises);
-        }).then(() => {
-            //刪除user和friend的共同聊天記錄
-            db.collection('mutualMessages').doc(mutualMessagesRefUid).delete();
-        }).then(() => {
-            userfriendsListRef.delete()
-        }).then(() => {
-            friendsListRef.delete();
-        }).then(() => {
-            //clear the messages console
-            selectFriendHandler(uid, username, avatar);
-        }).then(() => {
-            console.log(`Deleted ${displayName} successfully`);
-        }).catch(err => {
-            console.log(`Deleted ${displayName} failed`, err);
-        })
+        //set mutualMessagesRefUid to pass to modal
+        setMutualMessagessRefUid(mutualMessagesRefUid);
     }
 
     const selectFriendHandler = (friendUid, friendDisplayName, friendAvatar) => {
@@ -134,6 +100,17 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
                     </div >
                 ) : (
                         <>
+                            <DeleteFriendModal
+                                open={isOpen}
+                                setIsOpen={setIsOpen}
+                                uid={uid}
+                                username={username}
+                                avatar={avatar}
+                                selectFriendHandler={selectFriendHandler}
+                                otherUid={otherUid}
+                                otherDisplayName={otherDisplayName}
+                                mutualMessagesRefUid={mutualMessagesRefUid}
+                            />
                             <div className="search-box">
                                 <input
                                     type="text"
@@ -160,7 +137,7 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
                                         </a>
                                     </div>
                                     <div><PersonAddDisabledIcon
-                                        onClick={() => deleteFriend(friend.id, friend.displayName, friend.mutualMessagesRefUid)}
+                                        onClick={() => modalHandler(friend.id, friend.displayName, friend.mutualMessagesRefUid)}
                                         className={classes.deleteButtonStyle} />
                                     </div>
                                 </div>
@@ -168,8 +145,8 @@ function FriendList({ setCurrentFriendUid, setCurrentFriendDisplayName, setCurre
                             <div className="signout-button">
                                 <Link to='/' className={classes.linkStyle}>
                                     <Button
-                                        variant="contained" color="primary"
-                                        className={classes.buttonStyle}
+                                        variant="contained" 
+                                        color="primary"
                                         onClick={() => signOut()}
                                     >
                                         Sign Out

@@ -3,6 +3,7 @@ import { auth, db } from '../firebase/config';
 import { CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import AddFriendModal from '../modal/AddFriendModal';
 
 const useStyles = makeStyles((theme) => ({
     addFriendButtonStyle: {
@@ -21,6 +22,8 @@ function User() {
     const [pendingRequestsList, setPendingRequestsList] = useState([]);
     const [requestsList, setRequestsList] = useState([]);
     const [friendsList, setFriendsList] = useState([]);
+    const [otherDisplayName, setOtherDisplayName] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         const user = auth.currentUser;
@@ -140,6 +143,9 @@ function User() {
     }, []);
 
     const addFriend = (uid, username, friendUid, friendDisplayName) => {
+        // set other displayName and pass to modal
+        setOtherDisplayName(friendDisplayName);
+        
         const friendRequestsListRef = db.collection('users').doc(friendUid).collection('friendRequests').doc(uid);
         const query = friendRequestsListRef.get();
 
@@ -171,6 +177,9 @@ function User() {
                 }
             })
         }).then(() => {
+            //show a add modal
+            setIsOpen(true);
+        }).then(() => {
             console.log(`Sending request successfully`);
         }).catch(err => {
             console.log(`Sending request failed`, err);
@@ -184,6 +193,7 @@ function User() {
             </div>
         ) : (
                 <div className="users-container">
+                    <AddFriendModal open={isOpen} setIsOpen={setIsOpen} otherDisplayName={otherDisplayName}/>
                     <h3>Other Users</h3>
                     {othersList.map(other =>
                         other.uid !== uid &&

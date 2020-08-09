@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './messages.css'
 import { auth } from '../firebase/config';
 import { Redirect } from 'react-router-dom';
-import FriendProfile from './FriendProfile';
-import Others from './Others'
-import FriendsList from './FriendsList';
+import FriendProfile from '../friends/FriendProfile';
+import Others from '../friends/Others'
+import FriendsList from '../friends/FriendsList';
+import FriendRequest from '../friends/FriendRequest';
 import MessageConsole from './MessageConsole';
-import FriendRequest from './FriendRequest';
 
 function MessagePage() {
     const [currentFriendUid, setCurrentFriendUid] = useState('');

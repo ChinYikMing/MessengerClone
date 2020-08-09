@@ -21,13 +21,19 @@ const useStyles = makeStyles({
         backgroundColor: '#E0E3E9',
         color: '#000',
     },
-    facebookSignInButton: {
+    facebookSignInButtonStyle: {
         width: '300px',
         color: '#000',
         backgroundColor: blue[600],
         '&:hover': {
             backgroundColor: blue[500]
         }
+    },
+    forgotPasswordButtonStyle: {
+        width: '300px',
+        backgroundColor: blue[300],
+        color: '#000',
+        margin: 'auto'
     }
 })
 
@@ -70,7 +76,7 @@ function SignIn() {
                         if (providers.indexOf(firebase.auth.EmailAuthProvider.PROVIDER_ID) !== -1) {
                             // Password account already exists with the same email.
                             // Ask user to provide password associated with that account.
-                            var password = window.prompt('Please provide the password for ' + existingEmail);
+                            const password = window.prompt('Please provide the password for ' + existingEmail);
                             return auth.signInWithEmailAndPassword(existingEmail, password);
                         }
                     })
@@ -114,6 +120,15 @@ function SignIn() {
         auth.signInWithRedirect(provider);
     }
 
+    const changePassword = () => {
+        const email = window.prompt("Please provide your email address");
+        auth.sendPasswordResetEmail(email).then(() => {
+            window.alert("Please check your email address and reset the password");
+        }).catch(err => {
+            window.alert(err.message);
+        });
+    }
+
     if (uid)
         return <Redirect to='/message' />
 
@@ -124,7 +139,7 @@ function SignIn() {
                     color="primary"
                     variant="outlined"
                     onClick={() => facebookSignIn()}
-                    className={classes.facebookSignInButton}
+                    className={classes.facebookSignInButtonStyle}
                 >
                     <FacebookIcon />Sign in with Facebook
             </Button>
@@ -161,6 +176,11 @@ function SignIn() {
                     Create your Messenger account
                 </Button>
             </Link>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                <Button color="primary" variant="outlined" className={classes.forgotPasswordButtonStyle} onClick={() => changePassword()}>
+                    Forgot password?
+                </Button>
+            </div>
         </>
     )
 }
