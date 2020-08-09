@@ -2,7 +2,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Setting your firebase config file like below
 Create a directory called `firebase` in `src/components` and create a file called `config.js` in that directory <br />
-Then<br />
+Then adding below code to `config.js`<br />
 ```
 import firebase from 'firebase/app';
 import 'firebase/auth';
