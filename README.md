@@ -3,7 +3,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Setting your firebase config file like below
 Create a directory called firebase in src/components and create a file called config.js in that directory <br />
 Then<br />
-`import firebase from 'firebase/app';<br />
+```
+import firebase from 'firebase/app';<br />
 import 'firebase/auth';<br />
 import 'firebase/firestore';<br />
 import 'firebase/storage';<br />
@@ -18,7 +19,8 @@ const auth = firebase.auth();<br />
 const db = firebase.firestore();<br />
 const storage = firebase.storage();<br />
 
-export { auth, db, storage };<br />`
+export { auth, db, storage };<br />
+```
 
 ## Available Scripts
 
