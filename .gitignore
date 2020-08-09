@@ -8,6 +8,18 @@
 # testing
 /coverage
 
+# firebase config
+/src/components/firebase/config.js
+/.firebase
+.firebaserc
+database.rules.json
+firebase.json
+firestore.rules
+firestore.indexes.json
+
+# prevent conflicts with package.json when npm install
+package-lock.json
+
 # production
 /build
 

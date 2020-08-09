@@ -60,14 +60,14 @@ function SignIn() {
             }
             // The signed-in user info.
             const user = result.user;
-        }).catch(function (error) {
+        }).catch(err => {
             // Handle Errors here.
-            const errorCode = error.code;
-            const errorMessage = error.message;
+            const errorCode = err.code;
+            const errorMessage = err.message;
             // The email of the user's account used.
-            const existingEmail = error.email;
+            const existingEmail = err.email;
             // The firebase.auth.AuthCredential type that was used.
-            const pendingCred = error.credential;
+            const pendingCred = err.credential;
             // ...
             if (errorCode === 'auth/account-exists-with-different-credential') {
                 // Lookup existing account’s provider ID.
@@ -90,7 +90,7 @@ function SignIn() {
                         console.log("Account linking success", user);
                     }).catch(err => {
                         console.log("Account linking error", err);
-                    });;;
+                    });
             }
         });
     }, [])
