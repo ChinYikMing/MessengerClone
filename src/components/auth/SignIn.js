@@ -6,7 +6,7 @@ import FormikControl from '../formik/FormikControl';
 import { Button, makeStyles } from '@material-ui/core';
 import { Link, Redirect } from 'react-router-dom';
 import { blue } from '@material-ui/core/colors';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
 import firebase from 'firebase/app';
 import FacebookIcon from '@material-ui/icons/Facebook';
 
@@ -47,12 +47,14 @@ function SignIn() {
             if (user) {
                 const uid = user.uid;
                 setUid(uid);
+            } else {
+                setUid('');
             }
         })
     }, []);
 
     useEffect(() => {
-        auth.getRedirectResult().then(function (result) {
+        auth.getRedirectResult().then(result => {
             if (result.credential) {
                 // This gives you a Facebook Access Token. You can use it to access the Facebook API.
                 const token = result.credential.accessToken;
@@ -60,6 +62,32 @@ function SignIn() {
             }
             // The signed-in user info.
             const user = result.user;
+            const { displayName, photoURL, uid } = user;
+
+            db.collection('users').doc(uid).get().then(doc => {
+                if (doc.exists) {
+                    // user is exists
+                    setUid(uid);
+                } else {
+                    db.collection('users').doc(uid).set({
+                        displayName,
+                        avatar: photoURL
+                    }).then(() => {
+                        db.collection('users').doc(uid).collection('friends').doc(uid).set({
+                            displayName,
+                            friendUid: uid,
+                            mutualMessagesRefUid: uid,
+                            avatar: photoURL
+                        })
+                    }).then(() => {
+                        setUid(uid);
+                    }).catch(err => {
+                        console.log("create account failed", err);
+                    });
+                }
+            }).catch(err => {
+                console.log('Error getting document:', err);
+            })
         }).catch(err => {
             // Handle Errors here.
             const errorCode = err.code;
@@ -107,7 +135,7 @@ function SignIn() {
 
     const onSubmit = values => {
         const { email, password } = values;
-        firebase.auth().signInWithEmailAndPassword(email, password).then(res => {
+        auth.signInWithEmailAndPassword(email, password).then(res => {
             console.log('Sign In successfully')
         }).catch(err => {
             console.log(err);
