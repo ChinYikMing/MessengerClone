@@ -1,16 +1,28 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Setting your firebase config file like below
-Create a directory called `firebase` in `src/components` and create a file called `config.js` in that directory <br />
-Then adding below code to `config.js`<br />
-```
+## Setting your firebase for the messenger clone web app
+
+Step 1: Go to visit firebase docs https://firebase.google.com/docs/web/setup#config-object (Follow step 2 and step 3)
+
+Step 2: Create a directory called "firebase" under src/components directory and then create a file called "config.js"
+
+Step 3: Copy the code below to "config.js" file and replace the API_KEY, PROJECT_ID, SENDER_ID, APP_ID, MEASUREMENT_ID with the web app you just created followed in step 1
+
+```javascript
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/storage';
 
 const firebaseConfig = {
-  your firebase config
+  apiKey: "API_KEY",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://PROJECT_ID.firebaseio.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT_ID.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID",
+  measurementId: "G-MEASUREMENT_ID",
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -22,13 +34,21 @@ const storage = firebase.storage();
 export { auth, db, storage };
 ```
 
+Step 4: Go to your firebase web app console, click the "Build" section in sidebar,click Authentication enable Email/Password and Facebook sign-in method. After that, follow the "Before you begin" second and third step in this URL https://firebase.google.com/docs/auth/web/facebook-login#:~:text=Enable%20Facebook%20Login%3A,Secret%20you%20got%20from%20Facebook. to enable Facebook Login in your web app
+
+Step 5: In the same "Build" section in sidebar, click "Cloud Firestore" and then click "Start collection" with Collection ID: users, Document ID: click Auto-ID, Field 1: avatar(string), Field 2: displayName(string)
+
+Step 6: Click the "Rules" besides the "Data", choose production mode and change "allow read, write: if false" to "allow read, write, create: if request.auth != null"
+
+Last Step: Congrats! Now Follow the scripts and notes below and you are ready to go. Enjoy!
+
 ## Available Scripts
 
 In the project directory, you can run:
 
 ### `npm install`
 
-To install all dependencies of the app<br />
+Install the node_modules for the web app dependencies
 
 ### `npm start`
 
@@ -37,11 +57,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br />
 You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run build`
 
@@ -53,42 +68,9 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+## Notes
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Please make sure your running machine has following version of tools:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+1. Node.js, v12.18.3 or above
+2. npm, 6.14.11 or above
