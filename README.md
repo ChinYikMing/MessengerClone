@@ -34,7 +34,7 @@ const storage = firebase.storage();
 export { auth, db, storage };
 ```
 
-Step 4: Go to your firebase web app console, click the "Build" section in sidebar,click Authentication enable Email/Password and Facebook sign-in method. After that, follow the "Before you begin" second and third step in this URL https://firebase.google.com/docs/auth/web/facebook-login#:~:text=Enable%20Facebook%20Login%3A,Secret%20you%20got%20from%20Facebook. to enable Facebook Login in your web app
+Step 4: Go to your firebase web app console, click the "Build" section in sidebar,click Authentication enable Email/Password and Facebook sign-in method. After that, follow the "Before you begin" second and third step in this [URL](https://firebase.google.com/docs/auth/web/facebook-login#:~:text=Enable%20Facebook%20Login%3A,Secret%20you%20got%20from%20Facebook.) to enable Facebook Login in your web app
 
 Step 5: In the same "Build" section in sidebar, click "Cloud Firestore" and then click "Start collection" with Collection ID: users, Document ID: click Auto-ID, Field 1: avatar(string), Field 2: displayName(string)
 
