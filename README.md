@@ -2,7 +2,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Setting your firebase for the messenger clone web app
 
-Step 1: Go to visit firebase docs https://firebase.google.com/docs/web/setup#config-object (Follow step 2 and step 3)
+Step 1: Go to visit firebase [docs](https://firebase.google.com/docs/web/setup#config-object) (Follow step 2 and step 3)
 
 Step 2: Create a directory called "firebase" under src/components directory and then create a file called "config.js"
 
